@@ -4,7 +4,7 @@ import os
 def tmux_run(command: str) -> str:
     return subprocess.getoutput(f"tmux {command}")
 
-def tmux_sendcommand(session: str, command: str):
+def tmux_sendcommand(session: str, command: str) -> str:
     sk_out = tmux_run(f"send-keys -t {session} \"{command}\" C-m")
     if sk_out:
         log(f"Session '{session}': message when sending command '{command}' as follows:\n{sk_out}")
@@ -13,11 +13,30 @@ def tmux_sendcommand(session: str, command: str):
 def log(message: str):
     print(f"[tmuxer] {message}")
 
-def import_file(filename: str):
+def import_file(filename: str) -> list:
     if not os.path.isfile(filename):
         log(f"File '{filename}' does not exist!")
 
-    # add the thing
+    with open(filename, "r") as f:
+        data = f.read()
+
+    sessions = []
+    for line in data.splitlines():
+        line = line.strip()
+        
+        if line[0] == "#":
+            continue
+        
+        line_split = line.split("\t")
+        if len(line_split) != 3:
+            continue
+        
+        sessions.append(Session(*line_split))
+
+    if not sessions:
+        return None
+    
+    return sessions
 
 class Session:
     def __init__(self, name: str, directory: str, pyscript: str):
