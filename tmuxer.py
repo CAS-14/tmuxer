@@ -28,6 +28,13 @@ def import_file(filename: str) -> list:
             continue
         
         line_split = line.split("\t")
+
+        line_split_c = []
+        for item in line_split:
+            if item:
+                line_split_c.append(item)
+        line_split = line_split_c
+
         if len(line_split) != 3:
             continue
         
